@@ -37,7 +37,7 @@ fn Bucket(comptime alignment: std.mem.Alignment, comptime thread_safe: bool) typ
         }
 
         fn acquire(self: *@This()) ?[]u8 {
-            if (thread_safe) std.Io.Threaded.mutexLock(&self.mutex);
+            if (thread_safe) std.Io.Threaded.mutexLockUncancelable(&self.mutex);
             defer if (thread_safe) std.Io.Threaded.mutexUnlock(&self.mutex);
 
             if (self.free_list) |block| {
@@ -50,7 +50,7 @@ fn Bucket(comptime alignment: std.mem.Alignment, comptime thread_safe: bool) typ
         }
 
         fn release(self: *@This(), buf: []u8) void {
-            if (thread_safe) std.Io.Threaded.mutexLock(&self.mutex);
+            if (thread_safe) std.Io.Threaded.mutexLockUncancelable(&self.mutex);
             defer if (thread_safe) std.Io.Threaded.mutexUnlock(&self.mutex);
 
             const block: *Block = @ptrCast(@alignCast(buf.ptr));

@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub fn build(b: *std.Build) void {
+pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
@@ -16,8 +16,8 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run tests");
     test_step.dependOn(&run_media_tests.step);
 
-    {
-        const zbench_dep = b.dependency("zbench", .{
+    if (b.isRoot()) {
+        const zbench_dep = try b.dependencyLazy("zbench", .{
             .target = target,
             .optimize = .ReleaseFast,
         });
